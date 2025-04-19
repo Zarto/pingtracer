@@ -70,6 +70,7 @@ namespace PingTracer
             this.cbScalingMethod = new System.Windows.Forms.ComboBox();
             this.label11 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.cbLogThresholds = new System.Windows.Forms.CheckBox();
             this.cbLogSuccesses = new System.Windows.Forms.CheckBox();
             this.cbLogFailures = new System.Windows.Forms.CheckBox();
             this.mainMenu1 = new System.Windows.Forms.MainMenu(this.components);
@@ -84,7 +85,10 @@ namespace PingTracer
             this.menuItem_CommandLineArgs = new System.Windows.Forms.MenuItem();
             this.menuItem_resetWindowSize = new System.Windows.Forms.MenuItem();
             this.selectPingsPerSecond = new System.Windows.Forms.ComboBox();
-            this.cbLogThresholds = new System.Windows.Forms.CheckBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.lblBadThresholds = new System.Windows.Forms.Label();
+            this.label10 = new System.Windows.Forms.Label();
+            this.lblWorseThresholds = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.nudPingsPerSecond)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -652,6 +656,17 @@ namespace PingTracer
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Graph Options:";
             // 
+            // cbLogThresholds
+            // 
+            this.cbLogThresholds.AutoSize = true;
+            this.cbLogThresholds.Location = new System.Drawing.Point(441, 0);
+            this.cbLogThresholds.Name = "cbLogThresholds";
+            this.cbLogThresholds.Size = new System.Drawing.Size(99, 17);
+            this.cbLogThresholds.TabIndex = 51;
+            this.cbLogThresholds.Text = "Log Thresholds";
+            this.cbLogThresholds.UseVisualStyleBackColor = true;
+            this.cbLogThresholds.CheckedChanged += new System.EventHandler(this.cbLogThresholds_CheckedChanged);
+            // 
             // cbLogSuccesses
             // 
             this.cbLogSuccesses.AutoSize = true;
@@ -761,22 +776,55 @@ namespace PingTracer
             this.selectPingsPerSecond.TabIndex = 5;
             this.selectPingsPerSecond.SelectedIndexChanged += new System.EventHandler(this.selectPingsPerSecond_SelectedIndexChanged);
             // 
-            // cbLogThresholds
+            // label3
             // 
-            this.cbLogThresholds.AutoSize = true;
-            this.cbLogThresholds.Location = new System.Drawing.Point(441, 0);
-            this.cbLogThresholds.Name = "cbLogThresholds";
-            this.cbLogThresholds.Size = new System.Drawing.Size(99, 17);
-            this.cbLogThresholds.TabIndex = 51;
-            this.cbLogThresholds.Text = "Log Thresholds";
-            this.cbLogThresholds.UseVisualStyleBackColor = true;
-            this.cbLogThresholds.CheckedChanged += new System.EventHandler(this.cbLogThresholds_CheckedChanged);
+            this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(299, 520);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(87, 13);
+            this.label3.TabIndex = 23;
+            this.label3.Text = "Bad Thresholds :";
+            // 
+            // lblBadThresholds
+            // 
+            this.lblBadThresholds.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.lblBadThresholds.AutoSize = true;
+            this.lblBadThresholds.Location = new System.Drawing.Point(392, 520);
+            this.lblBadThresholds.Name = "lblBadThresholds";
+            this.lblBadThresholds.Size = new System.Drawing.Size(13, 13);
+            this.lblBadThresholds.TabIndex = 24;
+            this.lblBadThresholds.Text = "0";
+            // 
+            // label10
+            // 
+            this.label10.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(453, 520);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(99, 13);
+            this.label10.TabIndex = 25;
+            this.label10.Text = "Worse Thresholds :";
+            // 
+            // lblWorseThresholds
+            // 
+            this.lblWorseThresholds.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.lblWorseThresholds.AutoSize = true;
+            this.lblWorseThresholds.Location = new System.Drawing.Point(558, 520);
+            this.lblWorseThresholds.Name = "lblWorseThresholds";
+            this.lblWorseThresholds.Size = new System.Drawing.Size(13, 13);
+            this.lblWorseThresholds.TabIndex = 26;
+            this.lblWorseThresholds.Text = "0";
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(780, 540);
+            this.Controls.Add(this.lblWorseThresholds);
+            this.Controls.Add(this.label10);
+            this.Controls.Add(this.lblBadThresholds);
+            this.Controls.Add(this.label3);
             this.Controls.Add(this.selectPingsPerSecond);
             this.Controls.Add(this.cbReverseDNS);
             this.Controls.Add(this.groupBox1);
@@ -878,5 +926,9 @@ namespace PingTracer
 		private System.Windows.Forms.ComboBox cbScalingMethod;
 		private System.Windows.Forms.Label label11;
         private System.Windows.Forms.CheckBox cbLogThresholds;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label lblBadThresholds;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.Label lblWorseThresholds;
     }
 }

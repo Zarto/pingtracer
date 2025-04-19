@@ -26,9 +26,11 @@ namespace PingTracer
 
 		private long successfulPings = 0;
 		private long failedPings = 0;
+		private long badThresholdPings = 0;
+        private long worseThresholdPings = 0;
 
-		//private const string dateFormatString = "yyyy'-'MM'-'dd hh':'mm':'ss':'fff tt";
-		private const string fileNameFriendlyDateFormatString = "yyyy'-'MM'-'dd HH'-'mm'-'ss";
+        //private const string dateFormatString = "yyyy'-'MM'-'dd hh':'mm':'ss':'fff tt";
+        private const string fileNameFriendlyDateFormatString = "yyyy'-'MM'-'dd HH'-'mm'-'ss";
 
 		/// <summary>
 		/// This may be null if no ping tracing has begun.
@@ -392,7 +394,10 @@ namespace PingTracer
 			}
 			Interlocked.Exchange(ref successfulPings, 0);
 			Interlocked.Exchange(ref failedPings, 0);
-			pingGraphs.Clear();
+            Interlocked.Exchange(ref badThresholdPings, 0);
+            Interlocked.Exchange(ref worseThresholdPings, 0);
+
+            pingGraphs.Clear();
 			pingTargets.Clear();
 			pingTargetHasAtLeastOneSuccess.Clear();
 			clearedDeadHosts = false;
@@ -586,24 +591,30 @@ namespace PingTracer
 					{
 						if (LogSuccesses)
 							CreateLogEntry("" + GetTimestamp(time) + ", " + remoteHost.ToString() + ": " + e.Reply.Status.ToString() + " in " + e.Reply.RoundtripTime + " ms");
-						
-						if (LogThresholds)
+				
+						if (e.Reply.RoundtripTime > nudBadThreshold.Value)
 						{
-							if (e.Reply.RoundtripTime > nudBadThreshold.Value)
+							if (e.Reply.RoundtripTime > nudWorseThreshold.Value)
 							{
-								if (e.Reply.RoundtripTime > nudWorseThreshold.Value)
+								if (LogThresholds)
 									CreateLogEntry(GetTimestamp(time) + ", " + remoteHost.ToString() + ": Worse latency (" + e.Reply.RoundtripTime + " ms) !!");
-								else
-									CreateLogEntry(GetTimestamp(time) + ", " + remoteHost.ToString() + ": Bad latency (" + e.Reply.RoundtripTime + " ms) !");
+								Interlocked.Increment(ref worseThresholdPings);
 							}
-						}
+							else
+							{
+                                if (LogThresholds)
+                                    CreateLogEntry(GetTimestamp(time) + ", " + remoteHost.ToString() + ": Bad latency (" + e.Reply.RoundtripTime + " ms) !");
+								Interlocked.Increment(ref badThresholdPings);
+							}
+                        }
+						
 					}
 
 				}
 			}
 			finally
 			{
-				UpdatePingCounts(Interlocked.Read(ref successfulPings), Interlocked.Read(ref failedPings));
+				UpdatePingCounts(Interlocked.Read(ref successfulPings), Interlocked.Read(ref failedPings), Interlocked.Read(ref badThresholdPings), Interlocked.Read(ref worseThresholdPings));
 			}
 		}
 		private void AddPingTarget(IPAddress ipAddress, string name, bool reverseDnsLookup)
@@ -696,17 +707,19 @@ namespace PingTracer
 			}
 		}
 
-		private void UpdatePingCounts(long successful, long failed)
+		private void UpdatePingCounts(long successful, long failed, long badthreshold, long worsethreshold)
 		{
 			try
 			{
 				if (lblSuccessful.InvokeRequired)
-					lblSuccessful.Invoke(new Action<long, long>(UpdatePingCounts), successful, failed);
+					lblSuccessful.Invoke(new Action<long, long, long, long>(UpdatePingCounts), successful, failed, badthreshold, worsethreshold);
 				else
 				{
 					lblSuccessful.Text = successful.ToString();
 					lblFailed.Text = failed.ToString();
-				}
+					lblBadThresholds.Text = badthreshold.ToString();
+                    lblWorseThresholds.Text = worsethreshold.ToString();
+                }
 			}
 			catch (Exception)
 			{
@@ -1543,7 +1556,6 @@ namespace PingTracer
 			{
 			}
 		}
-
 
     }
 }
