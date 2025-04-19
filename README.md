@@ -1,11 +1,12 @@
 # Ping Tracer
 
-This is a fork of bp2008/pingtracer
+This is a fork of [**bp2008/pingtracer**](https://github.com/bp2008/pingtracer)
+
 I just added exceeded thresholds logging and counting feature
 
 Ping Tracer continuously pings each network host between your computer and a given destination, helping identify the source of connectivity problems.
 
-![image](https://github.com/bp2008/pingtracer/assets/5639911/3eff5b0c-b025-49bb-a149-77b2cb4c55ae)
+![PingTracerWithThresholdLogging](https://github.com/user-attachments/assets/547d6f1c-bb36-4075-b033-204d5059cbb7)
 
 This program helps to visually determine the origin of connection problems.  The latency over time is shown on graphs, and each instance of packet loss is marked in red.
 
