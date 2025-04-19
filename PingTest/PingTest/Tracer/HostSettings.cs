@@ -34,6 +34,7 @@ namespace PingTracer.Tracer
 		public bool preferIpv4 = true;
 		public bool logFailures = true;
 		public bool logSuccesses = false;
+		public bool logThresholds = false;
 
 		public override bool Equals(object other)
 		{
