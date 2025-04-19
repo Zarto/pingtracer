@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -119,10 +120,37 @@ namespace PingTracer
 			else
 				cbLogSuccesses.Checked = value;
 		}
-		/// <summary>
-		/// Assigned during MainForm construction, this field remembers the default window size.
-		/// </summary>
-		private readonly Size defaultWindowSize;
+
+        private bool _logThresholds = false;
+        /// <summary>
+        /// Gets or sets a value indicating whether exceeded thresholds should be logged for the current UI state.
+        /// </summary>
+        public bool LogThresholds
+        {
+            get
+            {
+                return _logThresholds;
+            }
+            set
+            {
+                _logThresholds = value;
+                SetLogThresholds(value);
+            }
+        }
+
+
+        private void SetLogThresholds(bool value)
+        {
+            if (this.InvokeRequired)
+                this.Invoke((Action<bool>)SetLogThresholds, value);
+            else
+                cbLogThresholds.Checked = value;
+        }
+
+        /// <summary>
+        /// Assigned during MainForm construction, this field remembers the default window size.
+        /// </summary>
+        private readonly Size defaultWindowSize;
 		/// <summary>
 		/// Calls <see cref="_rememberCurrentPosition"/> throttled.
 		/// </summary>
@@ -553,8 +581,24 @@ namespace PingTracer
 						pingTargetHasAtLeastOneSuccess[pingTargetId] = true;
 					}
 					Interlocked.Increment(ref successfulPings);
-					if (LogSuccesses && pingTargets.ContainsKey(pingTargetId))
-						CreateLogEntry("" + GetTimestamp(time) + ", " + remoteHost.ToString() + ": " + e.Reply.Status.ToString() + " in " + e.Reply.RoundtripTime + "ms");
+
+					if (pingTargets.ContainsKey(pingTargetId))
+					{
+						if (LogSuccesses)
+							CreateLogEntry("" + GetTimestamp(time) + ", " + remoteHost.ToString() + ": " + e.Reply.Status.ToString() + " in " + e.Reply.RoundtripTime + " ms");
+						
+						if (LogThresholds)
+						{
+							if (e.Reply.RoundtripTime > nudBadThreshold.Value)
+							{
+								if (e.Reply.RoundtripTime > nudWorseThreshold.Value)
+									CreateLogEntry(GetTimestamp(time) + ", " + remoteHost.ToString() + ": Worse latency (" + e.Reply.RoundtripTime + " ms) !!");
+								else
+									CreateLogEntry(GetTimestamp(time) + ", " + remoteHost.ToString() + ": Bad latency (" + e.Reply.RoundtripTime + " ms) !");
+							}
+						}
+					}
+
 				}
 			}
 			finally
@@ -1031,7 +1075,13 @@ namespace PingTracer
 			SaveProfileIfProfileAlreadyExists();
 		}
 
-		private void txtHost_TextChanged(object sender, EventArgs e)
+        private void cbLogThresholds_CheckedChanged(object sender, EventArgs e)
+        {
+            _logThresholds = cbLogThresholds.Checked;
+            SaveProfileIfProfileAlreadyExists();
+        }
+
+        private void txtHost_TextChanged(object sender, EventArgs e)
 		{
 			// This txtHost_TextChanged event handler was added on 2023-08-02, so it did not call SaveProfileIfProfileAlreadyExists(); like most other event handlers.
 			SelectedHostChanged.Invoke(sender, e);
@@ -1249,6 +1299,7 @@ namespace PingTracer
 			cbPreferIpv4.Checked = hs.preferIpv4;
 			LogFailures = hs.logFailures;
 			LogSuccesses = hs.logSuccesses;
+			LogThresholds = hs.logThresholds;
 
 
 			lock (settings.hostHistory)
@@ -1323,6 +1374,7 @@ namespace PingTracer
 			p.preferIpv4 = cbPreferIpv4.Checked;
 			p.logFailures = LogFailures;
 			p.logSuccesses = LogSuccesses;
+			p.logThresholds = LogThresholds;
 			return p;
 		}
 		/// <summary>
@@ -1491,5 +1543,7 @@ namespace PingTracer
 			{
 			}
 		}
-	}
+
+
+    }
 }
