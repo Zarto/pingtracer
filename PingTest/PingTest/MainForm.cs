@@ -570,7 +570,9 @@ namespace PingTracer
 				{
 					graph.AddPingLogToSpecificOffset(pingNum, new PingLog(time, 0, IPStatus.Unknown));
 					Interlocked.Increment(ref failedPings);
-					return;
+                    if (clearedDeadHosts && LogFailures && pingTargets.ContainsKey(pingTargetId))
+                        CreateLogEntry("" + GetTimestamp(time) + ", " + remoteHost.ToString() + ": TIMEOUT !");
+                    return;
 				}
 				graph.AddPingLogToSpecificOffset(pingNum, new PingLog(time, (short)e.Reply.RoundtripTime, e.Reply.Status));
 				if (e.Reply.Status != IPStatus.Success)
